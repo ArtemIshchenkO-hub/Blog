@@ -11,7 +11,6 @@ const start = async () => {
     await dbConfig.authenticate()
     console.log('DB connected')
 
-    await dbConfig.sync()
     appInstance.app.listen(PORT, () =>
       console.log(`Server started on Port: ${PORT}`),
     )
