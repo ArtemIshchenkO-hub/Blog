@@ -26,6 +26,8 @@ router.get('/me', authMiddleware, (req, res) => {
   res.json(req.user)
 })
 
-router.get('/healt', (req, res) => res.json({ status: ok }))
+router.get('/health', (_req, res) => {
+  res.json({ status: 'ok' })
+})
 
 export default router
