@@ -7,6 +7,11 @@ import {
   errorMiddleware,
 } from './middlewares/error.middlewares.js'
 
+const allowed = (process.env.CLIENT_URLS || '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean)
+
 export class App {
   constructor() {
     this.app = express()
@@ -17,7 +22,16 @@ export class App {
 
   #initializeMiddlewares() {
     this.app.use(express.json())
-    this.app.use(cors({ origin: process.env.API_URL, credentials: true }))
+    this.app.use(
+      cors({
+        origin: (origin, cb) => {
+          if (!origin) return cb(null, true)
+          if (allowed.includes(origin)) return cb(null, true)
+          return cb(new Error('Not allowed by CORS'))
+        },
+        credentials: true,
+      }),
+    )
     this.app.use(cookieParser())
   }
 

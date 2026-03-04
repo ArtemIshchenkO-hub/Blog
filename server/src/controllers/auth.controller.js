@@ -11,11 +11,13 @@ export class AuthController {
   }
 
   _setRefreshCookie(res, refreshToken) {
+    const isProd = process.env.NODE_ENV === 'production'
+
     res.cookie('refreshToken', refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd,
     })
   }
 
@@ -67,15 +69,17 @@ export class AuthController {
       const refreshToken = req.cookies?.refreshToken
       await this.authService.logout(refreshToken)
 
+      const isProd = process.env.NODE_ENV === 'production'
+
       res.clearCookie('refreshToken', {
         httpOnly: true,
-        sameSite: 'strict',
-        secure: process.env.NODE_ENV === 'production',
+        sameSite: isProd ? 'none' : 'lax',
+        secure: isProd,
       })
 
       return res.json({ ok: true })
     } catch (error) {
-      next(error)
+      return next(error)
     }
   }
 }
